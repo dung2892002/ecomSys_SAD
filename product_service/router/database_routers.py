@@ -23,7 +23,7 @@ class BookDBRouter:
         if app_label in self.route_app_labels:
             return db == 'book'
         return None
-
+    
 class MobileDBRouter:
     route_app_labels = {'mobile'}
 
@@ -49,7 +49,7 @@ class MobileDBRouter:
         if app_label in self.route_app_labels:
             return db == 'mobile'
         return None
-
+    
 class ClothesDBRouter:
     route_app_labels = {'clothes'}
 

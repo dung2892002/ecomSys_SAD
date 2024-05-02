@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-s2pg)l+g4xpp75a^abm^7!$&vns5*3#ia4bor)kwatc3lkfrya
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost']
-PORT = 8008
+PORT = 4002
 
 
 # Application definition
@@ -41,9 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'book',
-    'mobile',
-    'clothes'
+    'author'
 ]
 
 MIDDLEWARE = [
@@ -56,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'product_service.urls'
+ROOT_URLCONF = 'testmodel.urls'
 
 TEMPLATES = [
     {
@@ -74,30 +72,19 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'product_service.wsgi.application'
+WSGI_APPLICATION = 'books.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default':{
-        
-    },
-    'book': {
+    'default': {
         'ENGINE': 'djongo',
-        'NAME':'book',
-    },
-    'mobile': {
-        'ENGINE': 'djongo',
-        'NAME':'mobile',
-    },
-    'clothes': {
-        'ENGINE': 'djongo',
-        'NAME':'clothes',
+        'NAME':'testmodel',
     }
 }
-DATABASE_ROUTERS = ['router.database_routers.BookDBRouter','router.database_routers.MobileDBRouter','router.database_routers.ClothesDBRouter']
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
