@@ -46,7 +46,20 @@ class BookUpdateAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST )
         else:
             return Response({"error": "Please provide a book_id"}, status=status.HTTP_400_BAD_REQUEST) 
-    
+        
+class BookDeleteAPIView(APIView):
+    def delete(self, request):
+        book_id = request.query_params.get('book_id', None)
+        if book_id is not None:
+            try:
+                book = Book.objects.get(id=book_id)
+            except Book.DoesNotExist:
+                    return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+            book.delete()
+            return Response({"message": "Book delete succeed"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Please provide a book_id"}, status=status.HTTP_400_BAD_REQUEST) 
+        
 class BookSearchAPIView(APIView):
     def get(self, request):
         query = request.query_params.get('query', None)

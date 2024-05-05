@@ -1,4 +1,4 @@
-from .views import BookAPIView, AuthorAPIView, PublisherApiView, CategoryAPIView, BookSearchAPIView, BookDetailAPIView, BookUpdateAPIView
+from .views import BookAPIView, AuthorAPIView, PublisherApiView, CategoryAPIView, BookSearchAPIView, BookDetailAPIView, BookUpdateAPIView, BookDeleteAPIView
 from django.urls import path
 
 urlpatterns = [
@@ -8,5 +8,6 @@ urlpatterns = [
     path('books/', BookAPIView.as_view()),
     path('books/detail/', BookDetailAPIView.as_view()),
     path('books/search/', BookSearchAPIView.as_view()),
-    path('books/edit/', BookUpdateAPIView.as_view())
+    path('books/edit/', BookUpdateAPIView.as_view()),
+    path('books/delete/', BookDeleteAPIView.as_view())
 ]

@@ -46,7 +46,20 @@ class ClothesUpdateAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST )
         else:
             return Response({"error": "Please provide a clothes_id"}, status=status.HTTP_400_BAD_REQUEST) 
-    
+
+class ClothesDeleteAPIView(APIView):
+    def delete(self, request):
+        clothes_id = request.query_params.get('clothes_id', None)
+        if clothes_id is not None:
+            try:
+                clothes = Clothes.objects.get(id=clothes_id)
+            except Clothes.DoesNotExist:
+                    return Response({'error': 'Clothes not found'}, status=status.HTTP_404_NOT_FOUND)
+            clothes.delete()
+            return Response({"message": "Clothes delete succeed"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Please provide a clothes_id"}, status=status.HTTP_400_BAD_REQUEST) 
+
 class ClothesSearchAPIView(APIView):
     def get(self, request):
         query = request.query_params.get('query', None)

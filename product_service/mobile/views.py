@@ -46,7 +46,20 @@ class MobileUpdateAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST )
         else:
             return Response({"error": "Please provide a mobile_id"}, status=status.HTTP_400_BAD_REQUEST) 
-    
+
+class MobileDeleteAPIView(APIView):
+    def delete(self, request):
+        mobile_id = request.query_params.get('mobile_id', None)
+        if mobile_id is not None:
+            try:
+                mobile = Mobile.objects.get(id=mobile_id)
+            except Mobile.DoesNotExist:
+                    return Response({'error': 'Mobile not found'}, status=status.HTTP_404_NOT_FOUND)
+            mobile.delete()
+            return Response({"message": "Mobile delete succeed"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Please provide a mobile_id"}, status=status.HTTP_400_BAD_REQUEST) 
+        
 class MobileSearchAPIView(APIView):
     def get(self, request):
         query = request.query_params.get('query', None)

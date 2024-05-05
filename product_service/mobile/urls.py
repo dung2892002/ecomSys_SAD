@@ -1,4 +1,4 @@
-from .views import MobileAPIView, ProducerAPIView, TypeApiView, MobileUpdateAPIView, MobileSearchAPIView, MobileDetailAPIView
+from .views import MobileAPIView, ProducerAPIView, TypeApiView, MobileUpdateAPIView, MobileSearchAPIView, MobileDetailAPIView, MobileDeleteAPIView
 from django.urls import path
 
 urlpatterns = [
@@ -7,5 +7,6 @@ urlpatterns = [
     path('mobiles/', MobileAPIView.as_view()),
     path('mobiles/detail/', MobileDetailAPIView.as_view()),
     path('mobiles/search/', MobileSearchAPIView.as_view()),
-    path('mobiles/edit/', MobileUpdateAPIView.as_view())
+    path('mobiles/edit/', MobileUpdateAPIView.as_view()),
+    path('mobiles/delete/', MobileDeleteAPIView.as_view())
 ]
