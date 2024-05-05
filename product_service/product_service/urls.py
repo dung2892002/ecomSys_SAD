@@ -16,7 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from book import urls as book_urls
+from mobile import urls as mobile_urls
+from clothes import urls as clothes_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/v1/book/", include(book_urls))
+    path("api/v1/book/", include(book_urls)),
+    path("api/v1/mobile/", include(mobile_urls)),
+    path("api/v1/clothes/", include(clothes_urls))
 ]

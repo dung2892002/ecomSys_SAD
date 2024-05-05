@@ -34,7 +34,7 @@ class Mobile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     producer = models.ForeignKey(Producer, on_delete=models.CASCADE)
-    Type = models.ForeignKey(Type, on_delete=models.CASCADE)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "mobiles"
