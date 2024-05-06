@@ -4,31 +4,41 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Order
 from .serializers import OrderSerializer,OrderUserSerializer,OrderProductSerializer
+import json
 
 class AddOrderView(APIView):
     def post(self,request):
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
-            product = self.get_product(request.data.get("product_type"), request.data.get("product_id"))
-            if (request.data.get("quantity") > product.get('quantity')):
-                return Response({"error": "Not enough products"}, status=status.HTTP_400_BAD_REQUEST)
+            product_type = request.data.get("product_type")
+            product_id = request.data.get("product_id")
+            quantity = request.data.get("quantity")
+            quantity = int(quantity)
+            response = self.check_product_quantity_and_update(product_type, product_id, quantity)
+            if response.status_code == 400:
+                error_message = json.loads(response.text)['error']
+                return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    
-    def get_product(self, product_type, product_id):
+    def check_product_quantity_and_update(self, product_type, product_id, quantity):
         if product_type == 'book':
-            product_url = f"http://localhost:8008/api/v1/book/books/detail/?book_id={product_id}"
-        if product_type == 'mobile':
-            product_url = f"http://localhost:8008/api/v1/mobile/mobiles/detail/?mobile_id={product_id}"
-        if product_type == 'clothes':
-            product_url = f"http://localhost:8008/api/v1/clothes/clothes/detail/?clothes_id={product_id}"
-        response = requests.get(product_url)
-        if response.status_code == 200:
-            return response.json()
-        return None
-    
+            product_url = "http://localhost:8008/api/v1/book/books/quantity/"
+        elif product_type == 'mobile':
+            product_url = "http://localhost:8008/api/v1/mobile/mobiles/quantity/"
+        elif product_type == 'clothes':
+            product_url = "http://localhost:8008/api/v1/clothes/clothes/quantity/"
+        else:
+            return False
+        
+        payload = {
+            'product_id': product_id,
+            'quantity': int(quantity)
+        }
+        
+        response = requests.put(product_url, data=payload)
+        return response
 
 class ListOrderOfUser(APIView):
     def get(self, request):
