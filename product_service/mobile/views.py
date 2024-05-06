@@ -55,8 +55,10 @@ class MobileUpdateQuantity(APIView):
             mobile = Mobile.objects.get(id=product_id)
         except Mobile.DoesNotExist:
                 return Response({'error': 'Mobile not found'}, status=status.HTTP_404_NOT_FOUND)
-        if mobile.quantity < quantity or quantity < 0 or not isinstance(quantity, int):
-            return Response({'error': 'Invalid quantity'}, status=status.HTTP_400_BAD_REQUEST)
+        if quantity < 0 or not isinstance(quantity, int):
+            return Response({'error': 'Quantity must be a positive integer'}, status=status.HTTP_400_BAD_REQUEST)
+        if mobile.quantity < quantity:
+            return Response({'error': 'Not enough product'}, status=status.HTTP_400_BAD_REQUEST)
         price = float(mobile.price.to_decimal())
         mobile.quantity -= quantity
         mobile.price = price
