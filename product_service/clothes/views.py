@@ -55,7 +55,8 @@ class ClothesUpdateQuantity(APIView):
             clothes = Clothes.objects.get(id=product_id)
         except Clothes.DoesNotExist:
                 return Response({'error': 'Clothes not found'}, status=status.HTTP_404_NOT_FOUND)
-        if quantity < 0 or not isinstance(quantity, int):
+        quantity = int(quantity)
+        if quantity < 0:
             return Response({'error': 'Quantity must be a positive integer'}, status=status.HTTP_400_BAD_REQUEST)
         if clothes.quantity < quantity:
             return Response({'error': 'Not enough product'}, status=status.HTTP_400_BAD_REQUEST)
