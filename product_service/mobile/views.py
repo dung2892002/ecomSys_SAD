@@ -47,6 +47,22 @@ class MobileUpdateAPIView(APIView):
         else:
             return Response({"error": "Please provide a mobile_id"}, status=status.HTTP_400_BAD_REQUEST) 
 
+class MobileUpdateQuantity(APIView):
+    def put(self,request):
+        product_id = request.data.get('product_id')    
+        quantity = request.data.get('quantity')
+        try:
+            mobile = Mobile.objects.get(id=product_id)
+        except Mobile.DoesNotExist:
+                return Response({'error': 'Mobile not found'}, status=status.HTTP_404_NOT_FOUND)
+        if mobile.quantity < quantity or quantity < 0 or not isinstance(quantity, int):
+            return Response({'error': 'Invalid quantity'}, status=status.HTTP_400_BAD_REQUEST)
+        price = float(mobile.price.to_decimal())
+        mobile.quantity -= quantity
+        mobile.price = price
+        mobile.save()
+        return Response({'message': 'Quantity updated successfully'}, status=status.HTTP_200_OK)
+    
 class MobileDeleteAPIView(APIView):
     def delete(self, request):
         mobile_id = request.query_params.get('mobile_id', None)

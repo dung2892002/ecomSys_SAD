@@ -1,3 +1,4 @@
+from decimal import Decimal
 from .models import Book, Author, Category, Publisher
 from .serializers import BookSerializer, AuthorSerializer, PublisherSerializer, CategorySerializer
 from rest_framework.response import Response
@@ -47,6 +48,22 @@ class BookUpdateAPIView(APIView):
         else:
             return Response({"error": "Please provide a book_id"}, status=status.HTTP_400_BAD_REQUEST) 
         
+class BookUpdateQuantity(APIView):
+    def put(self,request):
+        product_id = request.data.get('product_id')    
+        quantity = request.data.get('quantity')
+        try:
+            book = Book.objects.get(id=product_id)
+        except Book.DoesNotExist:
+                return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+        if book.quantity < quantity or quantity < 0 or not isinstance(quantity, int):
+            return Response({'error': 'Invalid quantity'}, status=status.HTTP_400_BAD_REQUEST)
+        price = float(book.price.to_decimal())
+        book.quantity -= quantity
+        book.price = price
+        book.save()
+        return Response({'message': 'Quantity updated successfully'}, status=status.HTTP_200_OK)
+
 class BookDeleteAPIView(APIView):
     def delete(self, request):
         book_id = request.query_params.get('book_id', None)

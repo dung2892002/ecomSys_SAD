@@ -47,6 +47,22 @@ class ClothesUpdateAPIView(APIView):
         else:
             return Response({"error": "Please provide a clothes_id"}, status=status.HTTP_400_BAD_REQUEST) 
 
+class ClothesUpdateQuantity(APIView):
+    def put(self,request):
+        product_id = request.data.get('product_id')    
+        quantity = request.data.get('quantity')
+        try:
+            clothes = Clothes.objects.get(id=product_id)
+        except Clothes.DoesNotExist:
+                return Response({'error': 'Clothes not found'}, status=status.HTTP_404_NOT_FOUND)
+        if clothes.quantity < quantity or quantity < 0 or not isinstance(quantity, int):
+            return Response({'error': 'Invalid quantity'}, status=status.HTTP_400_BAD_REQUEST)
+        price = float(clothes.price.to_decimal())
+        clothes.quantity -= quantity
+        clothes.price = price
+        clothes.save()
+        return Response({'message': 'Quantity updated successfully'}, status=status.HTTP_200_OK)
+    
 class ClothesDeleteAPIView(APIView):
     def delete(self, request):
         clothes_id = request.query_params.get('clothes_id', None)
