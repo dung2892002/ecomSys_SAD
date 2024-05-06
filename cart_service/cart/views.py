@@ -47,7 +47,7 @@ class CartView(APIView):
             }
             return Response(response, status=status.HTTP_200_OK)
         else:
-             return Response({"error": "Please provide a user_id"}, status=status.HTTP_400_BAD_REQUEST) 
+            return Response({"error": "Please provide a user_id"}, status=status.HTTP_400_BAD_REQUEST) 
 
     def get_product(self, product_type, product_id):
         if product_type == 'book':
