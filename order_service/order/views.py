@@ -15,7 +15,7 @@ class AddOrderView(APIView):
             quantity = request.data.get("quantity")
             quantity = int(quantity)
             response = self.check_product_quantity_and_update(product_type, product_id, quantity)
-            if response.status_code == 400:
+            if response.status_code != 200:
                 error_message = json.loads(response.text)['error']
                 return Response({'error': error_message}, status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
