@@ -15,3 +15,11 @@ class StyleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Style
         fields = "__all__"
+
+class ClothesInfoSerializers(serializers.ModelSerializer):
+    producer = ProducerSerializer()
+    style = StyleSerializer()
+    
+    class Meta:
+        model = Clothes
+        fields = "__all__"

@@ -21,3 +21,12 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = "__all__"
+
+class BookInfoSerializers(serializers.ModelSerializer):
+    author = AuthorSerializer()
+    publisher = PublisherSerializer()
+    category = CategorySerializer()
+    
+    class Meta:
+        model = Book
+        fields = "__all__"

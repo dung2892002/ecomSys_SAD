@@ -1,5 +1,5 @@
 from .models import Clothes, Producer, Style
-from .serializers import ClothesSerializer, ProducerSerializer, StyleSerializer
+from .serializers import ClothesSerializer, ProducerSerializer, StyleSerializer, ClothesInfoSerializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -8,7 +8,7 @@ class ClothesAPIView(APIView):
     
     def get(self, request):
         clothes=Clothes.objects.filter()
-        serializer = ClothesSerializer(clothes, many=True)
+        serializer = ClothesInfoSerializers(clothes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
@@ -26,7 +26,7 @@ class ClothesDetailAPIView(APIView):
                 clothes = Clothes.objects.get(id=clothes_id)
             except Clothes.DoesNotExist:
                     return Response({'error': 'Clothes not found'}, status=status.HTTP_404_NOT_FOUND)
-            serializer = ClothesSerializer(clothes)
+            serializer = ClothesInfoSerializers(clothes)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Please provide a clothes_id"}, status=status.HTTP_400_BAD_REQUEST) 
@@ -84,7 +84,7 @@ class ClothesSearchAPIView(APIView):
         query = request.query_params.get('query', None)
         if query is not None:
             clothes = Clothes.objects.filter(name__icontains=query)
-            serializer = ClothesSerializer(clothes, many=True)
+            serializer = ClothesInfoSerializers(clothes, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Please provide a search query"}, status=status.HTTP_400_BAD_REQUEST) 

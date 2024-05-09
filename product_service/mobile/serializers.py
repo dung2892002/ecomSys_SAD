@@ -15,3 +15,11 @@ class TypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Type
         fields = "__all__"
+        
+class MobileInfoSerializer(serializers.ModelSerializer):
+    producer = ProducerSerializer()
+    type = TypeSerializer()
+    
+    class Meta:
+        model = Mobile
+        fields = "__all__"

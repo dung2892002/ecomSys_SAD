@@ -1,6 +1,6 @@
 from decimal import Decimal
 from .models import Book, Author, Category, Publisher
-from .serializers import BookSerializer, AuthorSerializer, PublisherSerializer, CategorySerializer
+from .serializers import BookSerializer, AuthorSerializer, PublisherSerializer, CategorySerializer, BookInfoSerializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -9,7 +9,7 @@ class BookAPIView(APIView):
     
     def get(self, request):
         books=Book.objects.filter()
-        serializer = BookSerializer(books, many=True)
+        serializer = BookInfoSerializers(books, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
@@ -27,7 +27,7 @@ class BookDetailAPIView(APIView):
                 book = Book.objects.get(id=book_id)
             except Book.DoesNotExist:
                     return Response({'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
-            serializer = BookSerializer(book)
+            serializer = BookInfoSerializers(book)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Please provide a book_id"}, status=status.HTTP_400_BAD_REQUEST) 
@@ -85,7 +85,7 @@ class BookSearchAPIView(APIView):
         query = request.query_params.get('query', None)
         if query is not None:
             books = Book.objects.filter(title__icontains=query)
-            serializer = BookSerializer(books, many=True)
+            serializer = BookInfoSerializers(books, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Please provide a search query"}, status=status.HTTP_400_BAD_REQUEST) 

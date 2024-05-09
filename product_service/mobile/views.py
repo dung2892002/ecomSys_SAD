@@ -1,5 +1,5 @@
 from .models import Mobile, Producer, Type
-from .serializers import MobileSerializer, ProducerSerializer, TypeSerializer
+from .serializers import MobileSerializer, ProducerSerializer, TypeSerializer, MobileInfoSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -8,7 +8,7 @@ class MobileAPIView(APIView):
     
     def get(self, request):
         mobiles=Mobile.objects.filter()
-        serializer = MobileSerializer(mobiles, many=True)
+        serializer = MobileInfoSerializer(mobiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
@@ -26,7 +26,7 @@ class MobileDetailAPIView(APIView):
                 mobile = Mobile.objects.get(id=mobile_id)
             except Mobile.DoesNotExist:
                     return Response({'error': 'Mobile not found'}, status=status.HTTP_404_NOT_FOUND)
-            serializer = MobileSerializer(mobile)
+            serializer = MobileInfoSerializer(mobile)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Please provide a mobile_id"}, status=status.HTTP_400_BAD_REQUEST) 
@@ -84,7 +84,7 @@ class MobileSearchAPIView(APIView):
         query = request.query_params.get('query', None)
         if query is not None:
             mobiles = Mobile.objects.filter(name__icontains=query)
-            serializer = MobileSerializer(mobiles, many=True)
+            serializer = MobileInfoSerializer(mobiles, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Please provide a search query"}, status=status.HTTP_400_BAD_REQUEST) 
