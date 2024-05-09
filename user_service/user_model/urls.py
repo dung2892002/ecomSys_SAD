@@ -1,6 +1,6 @@
-from .views import registration_req
+from .views import UserRegistration
 from django.urls import path
 
 urlpatterns = [
-    path('registration/', registration_req),
+    path('registration/', UserRegistration.as_view()),
 ]

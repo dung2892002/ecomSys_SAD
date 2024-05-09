@@ -1,35 +1,19 @@
 from __future__ import unicode_literals
-from django.http import HttpResponse
-from django.shortcuts import render
-import json
-from django.views.decorators.csrf import csrf_exempt
-from user_model.models import user_registration
-
-def user_validation(uname, password):
-    user_data = user_registration.objects.filter(email = uname, password = password)
-    if user_data:
-        return "Valid User"
-    else:
-        return "Invalid User"
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+from user_model.models import Account, User
+from django.contrib.auth.hashers import check_password
     
-@csrf_exempt
-def user_login(request):
-    uname = request.POST.get("User Name")
-    password = request.POST.get("Password")
-    resp = {}
-    
-    if uname and password:
-        respdata = user_validation(uname, password)
-        if respdata == "Valid User":
-            resp['status'] = 'Success'
-            resp['status_code'] = '200'
-            resp['message'] = 'Welcome to Ecommerce website......'
-        elif respdata == "Invalid User":
-            resp['status'] = 'Failed'
-            resp['status_code'] = '400'
-            resp['message'] = 'Invalid credentials.'
-    else:
-        resp['status'] = 'Failed'
-        resp['status_code'] = '400'
-        resp['message'] = 'All fields are mandatory.'
-    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+class UserLogin(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        try:
+            account = Account.objects.get(username=username)
+        except Account.DoesNotExist:
+            return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
+        if not check_password(password, account.password):
+            return Response({'error': 'Invalid username or password'}, status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.get(account = account)
+        return Response({'message': 'Login successful', 'user_id': user.id}, status=status.HTTP_200_OK)

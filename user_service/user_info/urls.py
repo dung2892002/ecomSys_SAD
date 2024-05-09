@@ -1,6 +1,6 @@
-from .views import user_info
+from .views import UserInfo
 from django.urls import path
 
 urlpatterns = [
-    path('info/', user_info),
+    path('info/', UserInfo.as_view()),
 ]

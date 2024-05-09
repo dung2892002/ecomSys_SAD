@@ -1,47 +1,46 @@
-from __future__ import unicode_literals
-from django.http import HttpResponse
-from django.shortcuts import render
-import json
-from django.views.decorators.csrf import csrf_exempt
-from user_model.models import user_registration
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth.hashers import make_password
+from .serializers import FullnameSerializer, AddressSerializer, AccountSerializer, UserSerializer
 
-def data_insert(fname, lname, email, mobile, password, address):
-    user_data = user_registration(fname = fname, lname = lname, email = email, mobile = mobile, password = password, address = address)
-    user_data.save()
-    return 1
+class UserRegistration(APIView):
+    def post(self, request):
+        data = request.data.copy()
+        if data.get('account')['password'] != data.get('confirm_password'):
+            return Response({'error': 'Password and confirm password do not match'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        data.pop('confirm_password')
+        data['account']['password'] = make_password(data.get('account')['password'])
+        
+        fullname_serializer = FullnameSerializer(data=data.get('fullname'))
+        address_serializer = AddressSerializer(data=data.get('address'))
+        account_serializer = AccountSerializer(data=data.get('account'))
+        user_serializer = UserSerializer(data=data)
+        
+        errors = {}
+        if not all([fullname_serializer.is_valid(), address_serializer.is_valid(), account_serializer.is_valid()]):
+            errors.update({
+                'fullname_errors': fullname_serializer.errors,
+                'address_errors': address_serializer.errors,
+                'account_errors': account_serializer.errors,
+            })
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
-@csrf_exempt
-def registration_req(request):
-    fname = request.POST.get("First Name")
-    lname = request.POST.get("Last Name")
-    email = request.POST.get("Email Id")
-    mobile = request.POST.get("Mobile Number")
-    password = request.POST.get("Password")
-    cnf_password = request.POST.get("Confirm Password")
-    address = request.POST.get("Address")
-    resp = {}
-    if fname and lname and email and mobile and password and cnf_password and address:
-        if len(str(mobile)) == 10:
-            if password == cnf_password:
-                respdata = data_insert(fname, lname, email, mobile, password, address)
-                if respdata:
-                    resp['status'] = 'Success'
-                    resp['status_code'] = '200'
-                    resp['message'] = 'User is registered Successfully.'
-                else:
-                    resp['status'] = 'Failed'
-                    resp['status_code'] = '400'
-                    resp['message'] = 'Unable to register user, Please try again.'
-            else:
-                resp['status'] = 'Failed'
-                resp['status_code'] = '400'
-                resp['message'] = 'Password and Confirm Password should be same.'
+        fullname_instance = fullname_serializer.save()
+        address_instance = address_serializer.save()
+        account_instance = account_serializer.save()
+
+        user_data = {
+            'fullname': fullname_instance.id,
+            'address': address_instance.id,
+            'account': account_instance.id,
+            'email': data.get('email'),
+            'mobile_number': data.get('mobile_number')
+        }
+        user_serializer = UserSerializer(data=user_data)
+        if user_serializer.is_valid():
+            user_serializer.save()
+            return Response(user_serializer.data, status=status.HTTP_201_CREATED)
         else:
-            resp['status'] = 'Failed'
-            resp['status_code'] = '400'
-            resp['message'] = 'Mobile Number should be 10 digit.'
-    else:
-        resp['status'] = 'Failed'
-        resp['status_code'] = '400'
-        resp['message'] = 'All fields are mandatory.'
-    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
