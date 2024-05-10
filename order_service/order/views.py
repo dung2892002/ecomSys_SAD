@@ -47,6 +47,8 @@ class UpdateStatus(APIView):
                 order = Order.objects.get(id=order_id)
             except Order.DoesNotExist:
                     return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+            if order.pay_status == True:
+                return Response({'error': 'The order has been paid'}, status=status.HTTP_404_NOT_FOUND)
             order.pay_status = True
             order.save()
             return Response({'message': 'Payment status updated successfully'}, status=status.HTTP_200_OK)
