@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from ship_status import urls as shipmen_urls
+from shipment import urls as shipmen_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/shipment/', include(shipmen_urls))

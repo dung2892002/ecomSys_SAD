@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ShipStatusConfig(AppConfig):
+class ShipmentConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'ship_status'
+    name = 'shipment'
