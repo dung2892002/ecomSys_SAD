@@ -39,14 +39,26 @@ class AddOrderView(APIView):
         
         response = requests.put(product_url, data=payload)
         return response
-
+class UpdateStatus(APIView):
+    def put(self, request):
+        order_id = request.query_params.get('order_id', None)
+        if order_id is not None:
+            try:
+                order = Order.objects.get(id=order_id)
+            except Order.DoesNotExist:
+                    return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+            order.pay_status = True
+            order.save()
+            return Response({'message': 'Payment status updated successfully'}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Please provide a order_id"}, status=status.HTTP_400_BAD_REQUEST) 
 class ListOrderOfUser(APIView):
     def get(self, request):
         user_id = request.data.get('user_id')
         orders = Order.objects.filter(user_id=user_id)
         serializer = OrderUserSerializer(orders, many = True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
 class ListOrderProduct(APIView):
     def get(self, request):
         product_type = request.data.get('product_type')

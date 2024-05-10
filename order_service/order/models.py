@@ -8,6 +8,7 @@ class Order(models.Model):
     user_id = models.IntegerField()
     quantity = models.IntegerField()
     date_added = models.DateField(auto_now_add=True)
+    pay_status = models.BooleanField(default=False)
     
     class Meta:
         db_table = "orders"
