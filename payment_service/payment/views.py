@@ -1,78 +1,45 @@
-from __future__ import unicode_literals
-from django.http import HttpResponse
-from django.shortcuts import render
+from .models import Payment
+from .serializers import PaymentSerializer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import status
+import requests
 import json
-from django.views.decorators.csrf import csrf_exempt
-from payment.models import payment_status as paystat
-from shipment_update.views import shipment_details_update as ship_update
 
-def get_transaction_details(uname):
-    user = paystat.objects.filter(username = uname)
-    for data in user.values():
-        return data
+class PaymentAPIView(APIView):
+    def post(self, request):
+        serializer = PaymentSerializer(data=request.data)
+        if(serializer.is_valid()):
+            order_response = self.order_update(request.data['order_id'])
+            if order_response.status_code == 404:
+                return Response({"error": json.loads(order_response.text)['error']}, status=status.HTTP_400_BAD_REQUEST)
+            payment = serializer.save()
+            shipment_response = self.ship_update(payment)
+            return Response({"payment": "payment successfully", "shipment": "create shipment successfully", "order":json.loads(order_response.text)['message']}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-def store_data(uname, product_type,product_id, price, quantity, mode_of_payment, mobile):
-    user_data = paystat(username = uname, product_type = product_type, product_id = product_id, price = price, 
-                        quantity = quantity, mode_of_payment = mode_of_payment, mobile = mobile, status = "Success")
-    user_data.save()
-    return 1
-
-@csrf_exempt
-def get_payment(request):
-    uname = request.POST.get("User Name")
-    product_type = request.POST.get("Product Type")
-    product_id = request.POST.get("Product Id")
-    price = request.POST.get("Product price")
-    quantity = request.POST.get("Product quantity")
-    mode_of_payment = request.POST.get("Payment mode")
-    mobile = request.POST.get("Mobile Number")
-    
-    resp = {}
-    if uname and product_type and product_id and price and quantity and mode_of_payment and mobile:
-        respdata = store_data(uname, product_type, product_id, price, quantity, mode_of_payment, mobile)
-        respdata2 = ship_update(uname)
-        if respdata:
-            resp['status'] = 'Success'
-            resp['status_code'] = '200'
-            resp['message'] = 'Transaction is completed.'
-        else:
-            resp['status'] = 'Failed'
-            resp['status_code'] = '400'
-            resp['message'] = 'Transaction is failed, Please try again.'
-    else:
-        resp['status'] = 'Failed'
-        resp['status_code'] = '400'
-        resp['message'] = 'All fields are mandatory.'
+    def ship_update(self,payment):
+        shipment = {
+            'user_id' : payment.user_id,
+            'order_id': payment.order_id,
+            'payment_id': payment.id,
+        }
         
-    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+        url = 'http://127.0.0.1:8006/api/v1/shipment/add/'
+        response = requests.post(url, data=shipment)
+        return response
+    
+    def order_update(self,order_id):
+        url = f"http://localhost:8003/api/v1/order/update/?order_id={order_id}"
+        response = requests.put(url)
+        return response
 
-@csrf_exempt
-def user_transaction_info(request):
-    if request.method == 'POST':
-        if 'application/json' in request.META['CONTENT_TYPE']:
-            val1 = json.loads(request.body)
-            uname = val1.get('User Name')
-            resp = {}
-            if uname:
-                respdata = get_transaction_details(uname)
-                if respdata:
-                    resp['status'] = 'Success'
-                    resp['status_code'] = '200'
-                    resp['data'] = respdata
-                else:
-                    resp['status'] = 'Failed'
-                    resp['status_code'] = '400'
-                    resp['message'] = 'User Not Found.'
-            else:
-                resp['status'] = 'Failed'
-                resp['status_code'] = '400'
-                resp['message'] = 'Fields is mandatory.'
+class PaymentOfUser(APIView):
+    def get(self,request):
+        user_id = request.query_params.get('user_id', None)
+        if user_id is not None:
+            payments = Payment.objects.filter(user_id=user_id)
+            serializer = PaymentSerializer(payments, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            resp['status'] = 'Failed'
-            resp['status_code'] = '400'
-            resp['message'] = 'Request type is not matched.'
-    else:
-        resp['status'] = 'Failed'
-        resp['status_code'] = '400'
-        resp['message'] = 'Request type is not matched.'
-    return HttpResponse(json.dumps(resp), content_type = 'application/json')
+            return Response({"error": "Please provide user_id"}, status=status.HTTP_400_BAD_REQUEST) 
