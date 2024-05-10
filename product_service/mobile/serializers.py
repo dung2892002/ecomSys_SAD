@@ -17,6 +17,7 @@ class TypeSerializer(serializers.ModelSerializer):
         fields = "__all__"
         
 class MobileInfoSerializer(serializers.ModelSerializer):
+    product_type = serializers.CharField(default="mobile")
     producer = ProducerSerializer()
     type = TypeSerializer()
     

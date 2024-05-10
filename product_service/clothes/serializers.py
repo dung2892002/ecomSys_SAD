@@ -17,6 +17,7 @@ class StyleSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class ClothesInfoSerializers(serializers.ModelSerializer):
+    product_type = serializers.CharField(default="clothes")
     producer = ProducerSerializer()
     style = StyleSerializer()
     

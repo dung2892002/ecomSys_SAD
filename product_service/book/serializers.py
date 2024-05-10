@@ -23,6 +23,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class BookInfoSerializers(serializers.ModelSerializer):
+    product_type = serializers.CharField(default="book")
     author = AuthorSerializer()
     publisher = PublisherSerializer()
     category = CategorySerializer()
