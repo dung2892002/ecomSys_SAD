@@ -10,9 +10,12 @@ class SearchAPIView(APIView):
     def post(self, request):
         key = request.data.get('key', '')
         user_id = request.data.get('user_id', '')
-        Search.objects.create(key=key, user_id=user_id)
-        result = self.search_book(key) + self.search_mobile(key) + self.search_clothes(key)
-        return Response(result, status=status.HTTP_200_OK)
+        if len(user_id) != 0:
+            Search.objects.create(key=key, user_id=user_id)
+        books =self.search_book(key)
+        mobiles = self.search_mobile(key)
+        clothes = self.search_clothes(key)
+        return Response({"books": books, "mobiles": mobiles, "clothes": clothes}, status=status.HTTP_200_OK)
         
     def search_book(self, key):
         book_service_url = f"http://localhost:8008/api/v1/book/books/search/?query={key}"
