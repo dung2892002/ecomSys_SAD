@@ -38,7 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'comment'
+    'comment',
+    'corsheaders'
+]
+
+CORS_ALLOW_CREDENTIALS = True 
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000' 
 ]
 
 MIDDLEWARE = [

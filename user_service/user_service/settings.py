@@ -40,7 +40,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'user_login',
     'user_info',
-    'user_model'
+    'user_model',
+    'corsheaders'
+]
+
+CORS_ALLOW_CREDENTIALS = True 
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000' 
 ]
 
 MIDDLEWARE = [
