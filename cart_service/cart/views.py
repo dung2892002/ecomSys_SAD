@@ -34,15 +34,15 @@ class CartView(APIView):
             for cart_item in cart_items:
                 product = self.get_product(cart_item.product_type, cart_item.product_id)
                 total_price_cart += cart_item.quantity * float(product.get('price', 0))
-                data.append(
-                    {
+                item = {
+                        'id': cart_item.id,
                         'product': product,
                         'quantity': cart_item.quantity,
                         'total_price': cart_item.quantity * float(product.get('price', 0))
                     }
-                )
+                data.append (item)
             response = {
-                'cart_items':data,
+                'cart':data,
                 'total_price_cart': total_price_cart
             }
             return Response(response, status=status.HTTP_200_OK)
