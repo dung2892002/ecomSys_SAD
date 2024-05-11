@@ -18,5 +18,22 @@ class ListCommentOfProduct(APIView):
         product_type = request.data.get('product_type')
         product_id = request.data.get('product_id')
         comments = Comment.objects.filter(product_type=product_type, product_id=product_id)
-        serializer = CommentShowSerializer(comments, many = True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data = []
+        for comment in comments:
+            user = self.get_user_info(comment.user_id)
+            fullname = user.get('fullname', {})
+            item = {
+                'id': comment.id,
+                'content': comment.content,
+                'rating': comment.rating,
+                'date_added': comment.date_added,
+                'user_full_name': f"{fullname.get('first_name', '')} {fullname.get('last_name', '')}"
+                
+            }
+            data.append(item)
+        return Response(data, status=status.HTTP_200_OK)
+    
+    def get_user_info(self, user_id):
+        url = f"http://localhost:8001/api/v1/user/info/?user_id={user_id}"
+        response = requests.get(url)
+        return response.json()
