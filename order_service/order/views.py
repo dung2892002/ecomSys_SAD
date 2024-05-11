@@ -58,8 +58,19 @@ class ListOrderOfUser(APIView):
     def get(self, request):
         user_id = request.data.get('user_id')
         orders = Order.objects.filter(user_id=user_id)
-        serializer = OrderUserSerializer(orders, many = True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data = []
+        for order in orders:
+            product = get_product(order.product_type, order.product_id)
+            item = {
+                    'id': order.id,
+                    'product': product,
+                    'quantity': order.quantity,
+                    'total_price': order.quantity * float(product.get('price', 0)),
+                    'date_added': order.date_added,
+                    'pay_status': order.pay_status
+                }
+            data.append (item)
+        return Response(data, status=status.HTTP_200_OK)
 
 class ListOrderProduct(APIView):
     def get(self, request):
@@ -68,3 +79,15 @@ class ListOrderProduct(APIView):
         orders = Order.objects.filter(product_type=product_type, product_id=product_id)
         serializer = OrderProductSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+def get_product(product_type, product_id):
+        if product_type == 'book':
+            product_url = f"http://localhost:8008/api/v1/book/books/detail/?book_id={product_id}"
+        if product_type == 'mobile':
+            product_url = f"http://localhost:8008/api/v1/mobile/mobiles/detail/?mobile_id={product_id}"
+        if product_type == 'clothes':
+            product_url = f"http://localhost:8008/api/v1/clothes/clothes/detail/?clothes_id={product_id}"
+        response = requests.get(product_url)
+        if response.status_code == 200:
+            return response.json()
+        return None
