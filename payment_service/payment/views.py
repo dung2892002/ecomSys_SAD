@@ -15,7 +15,8 @@ class PaymentAPIView(APIView):
                 return Response({"error": json.loads(order_response.text)['error']}, status=status.HTTP_400_BAD_REQUEST)
             payment = serializer.save()
             shipment_response = self.ship_update(payment)
-            return Response({"payment": "payment successfully", "shipment": "create shipment successfully", "order":json.loads(order_response.text)['message']}, status=status.HTTP_201_CREATED)
+            return Response({"payment": "payment successfully", "shipment": "create shipment successfully", 
+                             "order":json.loads(order_response.text)['message']}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def ship_update(self,payment):

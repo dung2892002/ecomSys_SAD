@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'book',
     'mobile',
     'clothes',
-    'corsheaders'
 ]
 
 CORS_ALLOW_CREDENTIALS = True 

@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Order
-from .serializers import OrderSerializer,OrderUserSerializer,OrderProductSerializer
+from .serializers import OrderSerializer,OrderProductSerializer
 import json
 
 class AddOrderView(APIView):
@@ -39,6 +39,7 @@ class AddOrderView(APIView):
         
         response = requests.put(product_url, data=payload)
         return response
+    
 class UpdateStatus(APIView):
     def put(self, request):
         order_id = request.query_params.get('order_id', None)
@@ -54,6 +55,7 @@ class UpdateStatus(APIView):
             return Response({'message': 'Payment status updated successfully'}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Please provide a order_id"}, status=status.HTTP_400_BAD_REQUEST) 
+                
 class ListOrderOfUser(APIView):
     def get(self, request):
         user_id = request.data.get('user_id')
@@ -76,7 +78,7 @@ class ListOrderProduct(APIView):
     def get(self, request):
         product_type = request.data.get('product_type')
         product_id = request.data.get('product_id')
-        orders = Order.objects.filter(product_type=product_type, product_id=product_id)
+        orders = Order.objects.filter(product_type=product_type, product_id=product_id, pay_status__in=[True])
         serializer = OrderProductSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
