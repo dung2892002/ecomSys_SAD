@@ -33,7 +33,7 @@ class MobileDetailAPIView(APIView):
 
 class MobileUpdateAPIView(APIView):
     def put(self, request):
-        mobile_id = request.query_params.get('mobile_id', None)
+        mobile_id = request.data.get('id', None)
         if mobile_id is not None:
             try:
                 mobile = Mobile.objects.get(id=mobile_id)
@@ -62,13 +62,14 @@ class MobileUpdateQuantity(APIView):
             return Response({'error': 'Not enough product'}, status=status.HTTP_400_BAD_REQUEST)
         price = float(mobile.price.to_decimal())
         mobile.quantity -= quantity
+        mobile.sold += quantity
         mobile.price = price
         mobile.save()
         return Response({'message': 'Quantity updated successfully'}, status=status.HTTP_200_OK)
     
 class MobileDeleteAPIView(APIView):
     def delete(self, request):
-        mobile_id = request.query_params.get('mobile_id', None)
+        mobile_id = request.data.get('id', None)
         if mobile_id is not None:
             try:
                 mobile = Mobile.objects.get(id=mobile_id)

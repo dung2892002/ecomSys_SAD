@@ -33,7 +33,7 @@ class ClothesDetailAPIView(APIView):
 
 class ClothesUpdateAPIView(APIView):
     def put(self, request):
-        clothes_id = request.query_params.get('clothes_id', None)
+        clothes_id = request.data.get('id', None)
         if clothes_id is not None:
             try:
                 clothes = Clothes.objects.get(id=clothes_id)
@@ -62,13 +62,14 @@ class ClothesUpdateQuantity(APIView):
             return Response({'error': 'Not enough product'}, status=status.HTTP_400_BAD_REQUEST)
         price = float(clothes.price.to_decimal())
         clothes.quantity -= quantity
+        clothes.sold += quantity
         clothes.price = price
         clothes.save()
         return Response({'message': 'Quantity updated successfully'}, status=status.HTTP_200_OK)
     
 class ClothesDeleteAPIView(APIView):
     def delete(self, request):
-        clothes_id = request.query_params.get('clothes_id', None)
+        clothes_id = request.data.get('id', None)
         if clothes_id is not None:
             try:
                 clothes = Clothes.objects.get(id=clothes_id)

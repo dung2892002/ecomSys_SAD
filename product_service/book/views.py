@@ -34,7 +34,7 @@ class BookDetailAPIView(APIView):
 
 class BookUpdateAPIView(APIView):
     def put(self, request):
-        book_id = request.query_params.get('book_id', None)
+        book_id = request.data.get('id', None)
         if book_id is not None:
             try:
                 book = Book.objects.get(id=book_id)
@@ -63,13 +63,14 @@ class BookUpdateQuantity(APIView):
             return Response({'error': 'Not enough product'}, status=status.HTTP_400_BAD_REQUEST)
         price = float(book.price.to_decimal())
         book.quantity -= quantity
+        book.sold += quantity
         book.price = price
         book.save()
         return Response({'message': 'Quantity updated successfully'}, status=status.HTTP_200_OK)
 
 class BookDeleteAPIView(APIView):
     def delete(self, request):
-        book_id = request.query_params.get('book_id', None)
+        book_id = request.data.get('id', None)
         if book_id is not None:
             try:
                 book = Book.objects.get(id=book_id)

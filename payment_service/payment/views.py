@@ -31,8 +31,11 @@ class PaymentAPIView(APIView):
         return response
     
     def order_update(self,order_id):
-        url = f"http://localhost:8003/api/v1/order/update/?order_id={order_id}"
-        response = requests.put(url)
+        url = f"http://localhost:8003/api/v1/order/update/"
+        order = {
+            'order_id': order_id,
+        }
+        response = requests.put(url, data=order)
         return response
 
 class PaymentOfUser(APIView):

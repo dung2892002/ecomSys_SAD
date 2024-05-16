@@ -17,7 +17,7 @@ class UserInfo(APIView):
     
 class UserUpdateInfo(APIView):
     def put(self, request):
-        user_id = request.query_params.get('user_id', None)
+        user_id = request.data.get('id', None)
         try:
             user = User.objects.get(id=user_id)
         except User.DoesNotExist:

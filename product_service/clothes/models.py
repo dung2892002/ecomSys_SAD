@@ -27,6 +27,7 @@ class Clothes(models.Model):
     id =  models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=9, decimal_places=2)
+    sold = models.IntegerField(default=0)
     quantity = models.IntegerField()
     image = models.CharField(max_length=255)
     description = models.TextField()

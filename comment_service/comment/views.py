@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Comment
-from .serializers import CommentSerializer, CommentShowSerializer
+from .serializers import CommentSerializer
 
 class AddCommentView(APIView):
     def post(self, request):
@@ -15,8 +15,8 @@ class AddCommentView(APIView):
     
 class ListCommentOfProduct(APIView):
     def get(self, request):
-        product_type = request.data.get('product_type')
-        product_id = request.data.get('product_id')
+        product_type = request.query_params.get('product_type')
+        product_id = request.query_params.get('product_id')
         comments = Comment.objects.filter(product_type=product_type, product_id=product_id)
         data = []
         for comment in comments:

@@ -63,7 +63,7 @@ class CartView(APIView):
 
 class DeleteCartItemView(APIView):
     def delete(self, request):
-        cart_item_id = request.query_params.get('cart_item_id', None)
+        cart_item_id = request.data.get('cart_item_id', None)
         if cart_item_id is not None:
             try:
                 cart_item = CartItem.objects.get(id = cart_item_id)
